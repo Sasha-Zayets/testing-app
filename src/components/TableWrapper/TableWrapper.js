@@ -29,6 +29,16 @@ const headers = [
   },
 ];
 
+const TableHeader = ({ item }) => (
+  <>
+    <TableTd>Техника</TableTd>
+    <TableTd>{ item.sumCommon }</TableTd>
+    <TableTd>{ item.sumActive }</TableTd>
+    <TableTd>{ item.sumMovement }</TableTd>
+    <TableTd>{ item.unactiveSum }</TableTd>
+  </>
+);
+
 const WorkerHeader = ({ item }) => (
   <>
     <TableTd>{ item.common }</TableTd>
@@ -41,11 +51,10 @@ const WorkerHeader = ({ item }) => (
 const OtherTdHeaderRender = ({ data }) => {
   return (
     <>
-      {
-        data.map((item) => (
-          <TableTd key={item}>{ item }</TableTd>
-        ))
-      }
+      <TableTd>{ data.sumCommon }</TableTd>
+      <TableTd>{ data.sumActive }</TableTd>
+      <TableTd>{ data.sumMovement }</TableTd>
+      <TableTd>{ data.unactiveSum }</TableTd>
     </>
   )
 };
@@ -117,7 +126,7 @@ const RenderBort = ({ data }) => {
             )}
             blockHeaderStyles={{ width: 320 }}
             renderHeaderOthers={() => (
-              <OtherTdHeaderRender data={oneHeaderData} />
+              <OtherTdHeaderRender data={item} />
             )}
           >
             <WorkerRender data={item.workers} />
@@ -127,9 +136,8 @@ const RenderBort = ({ data }) => {
   )
 };
 
-const TableWrapper = () => {
+const TableWrapper = ({ data }) => {
   const dispatch = useDispatch();
-  const { data } = useSelector((state) => state);
 
   const handleChange = (checked, data, type) => {
     dispatch(changeDataWorker(checked, data, type));
@@ -137,9 +145,11 @@ const TableWrapper = () => {
 
   return (
     <Wrapper>
-      <Table data={data} headers={headers}>
+      <Table headerRender={() => (
+        <TableHeader item={data.totalHeaders} />
+      )}>
       {
-        data.map((item) => (
+        data.table.map((item) => (
           <React.Fragment key={item.name}>
             <ToggleComponents
               active={item.active}
@@ -151,7 +161,7 @@ const TableWrapper = () => {
                 />
               )}
               renderHeaderOthers={() => (
-                <OtherTdHeaderRender data={oneHeaderData} />
+                <OtherTdHeaderRender data={item} />
               )}
             >
               <RenderBort data={item.machines} />

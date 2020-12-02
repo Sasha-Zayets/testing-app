@@ -4,6 +4,7 @@ import {
   CHANGE_DATA_CHART,
 } from './dataReducer';
 import activeDataChart from "../utils/activeDataChart";
+import dataTable from "../utils/dataTable";
 
 export const changeData = (payload) => ({
   type: CHANGE_GLOBAL,
@@ -25,7 +26,7 @@ export const changeDataWorker = (checked, data, type) => (dispatch, getState) =>
     const store = getState();
 
     if (type === 'global') {
-      const newStore = store.data.map(item => {
+      const newStore = store.data.table.map(item => {
         const machines = item.machines.map(el => {
           const workers = el.workers.map(work => ({
             ...work,
@@ -52,13 +53,11 @@ export const changeDataWorker = (checked, data, type) => (dispatch, getState) =>
         return item;
       });
 
-      const result = activeDataChart(newStore);
-      dispatch(changeChartData(result));
-      dispatch(changeDataValue(newStore));
+      dispatch(changeDataStore(newStore));
     }
 
     if (type === 'bort') {
-      const findBort = store.data.find((item) => {
+      const findBort = store.data.table.find((item) => {
         const findIndex = item.machines.findIndex(el => el.id === data.id);
         return findIndex > -1;
       });
@@ -82,21 +81,19 @@ export const changeDataWorker = (checked, data, type) => (dispatch, getState) =>
         return item;
       });
 
-      const newStore = store.data.map(item => {
+      const newStore = store.data.table.map(item => {
         if (item.name === findBort.name) {
           return findBort;
         }
         return item;
       });
 
-      const result = activeDataChart(newStore);
-      dispatch(changeChartData(result));
-      dispatch(changeDataValue(newStore));
+      dispatch(changeDataStore(newStore));
     }
 
     if (type === 'worker') {
       let machineIndex = 0;
-      const findElement = store.data.find(item => {
+      const findElement = store.data.table.find(item => {
         const findMachine = item.machines.findIndex((machine, index) => {
           const findIndex = machine.workers.findIndex(el => el.name === data.name && el.rfid === data.rfid);
 
@@ -134,16 +131,14 @@ export const changeDataWorker = (checked, data, type) => (dispatch, getState) =>
         });
         findElement.machines = machinesArray;
 
-        const newStore = store.data.map(item => {
+        const newStore = store.data.table.map(item => {
           if (item.name === findElement.name) {
             return findElement;
           }
           return item;
         });
 
-        const result = activeDataChart(newStore);
-        dispatch(changeChartData(result));
-        dispatch(changeDataValue(newStore));
+        dispatch(changeDataStore(newStore));
       } else {
         const machinesArray = findElement.machines.map((item, index) => {
           if (index === machineIndex) {
@@ -157,19 +152,25 @@ export const changeDataWorker = (checked, data, type) => (dispatch, getState) =>
         });
 
         findElement.machines = machinesArray;
-        const newStore = store.data.map(item => {
+        const newStore = store.data.table.map(item => {
           if (item.name === findElement.name) {
             return findElement;
           }
           return item;
         });
 
-        const result = activeDataChart(newStore);
-        dispatch(changeChartData(result));
-        dispatch(changeDataValue(newStore));
+        dispatch(changeDataStore(newStore));
       }
     }
   } catch (e) {
     console.log(e);
   }
 };
+
+const changeDataStore = (newStore) => (dispatch) => {
+  const result = activeDataChart(newStore);
+  const newData = dataTable(newStore);
+
+  dispatch(changeChartData(result));
+  dispatch(changeDataValue(newData));
+}

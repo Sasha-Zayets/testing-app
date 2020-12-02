@@ -1,12 +1,15 @@
 import { convertJson } from "../utils/convertJson";
 import activeDataChart from "../utils/activeDataChart";
+import dataTable from "../utils/dataTable";
 export const CHANGE_GLOBAL = 'CHANGE_GLOBAL';
 export const CHANGE_WORKER = 'CHANGE_WORKER';
 export const CHANGE_DATA_CHART = 'CHANGE_DATA_CHART';
 
+const data = dataTable(convertJson());
+const activeDataChartDefault = activeDataChart(convertJson());
 const initialState = {
-  data: convertJson(),
-  activeDataChart: activeDataChart(convertJson()),
+  data,
+  activeDataChart: activeDataChartDefault,
 };
 
 const dataReducer = (state = initialState, action) => {
